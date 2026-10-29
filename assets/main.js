@@ -21,15 +21,19 @@ nav.addEventListener('click', e => {
 document.querySelectorAll('.video').forEach(box => {
   const id = box.dataset.yt;
   const start = box.dataset.start ? `&start=${encodeURIComponent(box.dataset.start)}` : '';
-  box.style.backgroundImage = `url(https://i.ytimg.com/vi/${id}/hqdefault.jpg)`;
+  const thumb = q => `https://i.ytimg.com/vi/${id}/${q}.jpg`;
+  const probe = new Image();
+  probe.onload = () => { box.style.backgroundImage = `url(${probe.naturalWidth > 200 ? thumb('maxresdefault') : thumb('hqdefault')})`; };
+  probe.onerror = () => { box.style.backgroundImage = `url(${thumb('hqdefault')})`; };
+  probe.src = thumb('maxresdefault');
   const b = document.createElement('button');
   b.type = 'button';
-  b.setAttribute('aria-label', 'Reproduzir vídeo');
+  b.setAttribute('aria-label', `Reproduzir: ${box.dataset.title}`);
   b.innerHTML = '<i class="bi bi-play-circle-fill"></i>';
   b.addEventListener('click', () => {
     const f = document.createElement('iframe');
     f.src = `https://www.youtube-nocookie.com/embed/${id}?autoplay=1&rel=0${start}`;
-    f.title = 'Podcast com Ricardo Neves';
+    f.title = box.dataset.title;
     f.allow = 'autoplay; encrypted-media; picture-in-picture; fullscreen';
     f.allowFullscreen = true;
     f.referrerPolicy = 'strict-origin-when-cross-origin';
